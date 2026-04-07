@@ -8,7 +8,6 @@ import authRouter from "./router/authRouter.js";
 import dokumenRouter from "./router/dokumenRouter.js";
 
 import helmet from "helmet";
-import ExpressMongoSanitize from "express-mongo-sanitize";
 
 dotenv.config();
 
@@ -18,7 +17,6 @@ const port = 3000;
 //middleware
 app.use(express.json());
 app.use(helmet());
-app.use(ExpressMongoSanitize());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("./public"));
