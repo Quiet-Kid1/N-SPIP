@@ -10,6 +10,7 @@ import {
   detailDokumen,
   updateDokumen,
   uploadDokumen,
+  downloadDokumen,
 } from "../controllers/dokumenController.js";
 
 import { upload } from "../utils/uploadFileHandler.js";
@@ -26,6 +27,9 @@ router.post("/", protectedMiddleware, adminMiddleware, createDokumen);
 //read Data Dokumen
 // get api/v1/dokumen
 router.get("/", allDokumen);
+
+//test
+router.get("/download", protectedMiddleware, adminMiddleware, downloadDokumen);
 
 //detail Data Dokumen
 //get api/v1/dokumen/id
