@@ -4,6 +4,9 @@ import {
   loginUser,
   getCurrentUser,
   logoutUser,
+  getAllUsers,
+  updateUser,
+  deleteUser,
 } from "../controllers/authController.js";
 import {
   protectedMiddleware,
@@ -23,5 +26,10 @@ router.get("/logout", protectedMiddleware, logoutUser);
 
 //post/api/v1/auth/getUser
 router.get("/getuser", protectedMiddleware, getCurrentUser);
+
+router.get("/users", getAllUsers); // GET /auth/users
+
+router.patch("/users/:id", updateUser);
+router.delete("/users/:id", deleteUser);
 
 export default router;

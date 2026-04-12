@@ -29,7 +29,7 @@ const createSendResToken = (user, statusCode, res) => {
 export const registerUser = asyncHandler(async (req, res) => {
   const isOwner = (await User.countDocuments()) === 0;
 
-  const role = isOwner ? "owner" : "user";
+  const role = isOwner ? "admin" : req.body.role || "user";
 
   const createUser = await User.create({
     name: req.body.name,
@@ -82,4 +82,32 @@ export const logoutUser = async (req, res) => {
   res.status(200).json({
     message: "logout berhasil",
   });
+};
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}).select("-password");
+    res.status(200).json({ users });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// PATCH /auth/users/:id
+export const updateUser = async (req, res) => {
+  const { name, email, role } = req.body;
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    { name, email, role },
+    { new: true, runValidators: true },
+  ).select("-password");
+  if (!user) return res.status(404).json({ message: "User tidak ditemukan" });
+  res.status(200).json({ user });
+};
+
+// DELETE /auth/users/:id
+export const deleteUser = async (req, res) => {
+  const user = await User.findByIdAndDelete(req.params.id);
+  if (!user) return res.status(404).json({ message: "User tidak ditemukan" });
+  res.status(200).json({ message: "User berhasil dihapus" });
 };

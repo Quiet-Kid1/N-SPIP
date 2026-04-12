@@ -11,9 +11,12 @@ import {
   updateDokumen,
   uploadDokumen,
   downloadDokumen,
+  searchDokumen,
+  kirimPengingat,
 } from "../controllers/dokumenController.js";
 
 import { upload } from "../utils/uploadFileHandler.js";
+import { templatePengingatEmail } from "../utils/emailTemplate.js";
 
 const router = express.Router();
 
@@ -22,19 +25,24 @@ const router = express.Router();
 //Create Data Dokumen
 // post api/v1/dokumen
 //middleware owner
-router.post("/", protectedMiddleware, adminMiddleware, createDokumen);
+router.post("/", protectedMiddleware, createDokumen);
+
+//search data berdasarkan nama dan kategori
+router.get("/dokumen/search", searchDokumen);
 
 //read Data Dokumen
 // get api/v1/dokumen
 router.get("/", allDokumen);
 
 //test
-router.get("/download", protectedMiddleware, adminMiddleware, downloadDokumen);
+router.get("/download", protectedMiddleware, downloadDokumen);
 
 //detail Data Dokumen
 //get api/v1/dokumen/id
 //middleware owner
-router.get("/:id", protectedMiddleware, adminMiddleware, detailDokumen);
+router.get("/:id", detailDokumen);
+
+router.post("/kirim-pengingat", kirimPengingat);
 
 //update Data Dokumen
 //put api/v1/dokumen/id
@@ -52,7 +60,6 @@ router.delete("/:id", protectedMiddleware, adminMiddleware, deleteDokumen);
 router.post(
   "/dokumen-upload",
   protectedMiddleware,
-  adminMiddleware,
   upload.single("file"),
   uploadDokumen,
 );
