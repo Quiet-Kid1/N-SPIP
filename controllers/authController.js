@@ -22,7 +22,10 @@ const createSendResToken = (user, statusCode, res) => {
   user.password = undefined;
 
   res.status(statusCode).json({
-    data: user,
+    data: {
+      ...user.toObject(), // ← spread user fields
+      token, // ← tambahkan token di response body
+    },
   });
 };
 
@@ -56,7 +59,7 @@ export const loginUser = asyncHandler(async (req, res) => {
     createSendResToken(userData, 200, res);
   } else {
     res.status(400);
-    throw new Error("Invalid User");
+    throw new Error("Username atau Password salah!");
   }
 });
 

@@ -6,11 +6,46 @@ import transporter from "../config/emailConfig.js";
 import { templatePengingatEmail } from "../utils/emailTemplate.js";
 
 export const createDokumen = asyncHandler(async (req, res) => {
-  const newDokumen = await Dokumen.create(req.body);
+  const { name, Kategori, tanggal, deskripsi, file } = req.body;
+
+  // Ambil tahun-bulan dari tanggal untuk pencocokan
+  const tanggalDate = new Date(tanggal);
+  const startOfMonth = new Date(
+    tanggalDate.getFullYear(),
+    tanggalDate.getMonth(),
+    1,
+  );
+  const endOfMonth = new Date(
+    tanggalDate.getFullYear(),
+    tanggalDate.getMonth() + 1,
+    1,
+  );
+
+  const dokumen = await Dokumen.findOneAndUpdate(
+    {
+      // Kondisi pencarian — jika ketiga field ini sama, update
+      name,
+      Kategori,
+      tanggal: { $gte: startOfMonth, $lt: endOfMonth },
+    },
+    {
+      // Data yang di-update/replace
+      name,
+      Kategori,
+      tanggal,
+      deskripsi,
+      file,
+    },
+    {
+      upsert: true, // buat baru jika tidak ditemukan
+      new: true, // return dokumen setelah update
+      runValidators: true,
+    },
+  );
 
   return res.status(201).json({
-    message: "Berhasil Menambahkan Dokumen",
-    data: newDokumen,
+    message: "Berhasil Menambahkan/Memperbarui Dokumen",
+    data: dokumen,
   });
 });
 
@@ -52,7 +87,7 @@ export const allDokumen = asyncHandler(async (req, res) => {
 
   // Pagination
   const page = req.query.page * 1 || 1;
-  const limitData = req.query.limit * 1 || 10;
+  const limitData = req.query.limit * 1 || 30;
   const skipData = (page - 1) * limitData;
 
   query = query.skip(skipData).limit(limitData);

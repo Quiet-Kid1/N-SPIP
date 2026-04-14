@@ -5,7 +5,13 @@ import asyncHandler from "./asyncHandler.js";
 export const protectedMiddleware = asyncHandler(async (req, res, next) => {
   let token;
 
+  // Cek cookie dulu
   token = req.cookies.jwt;
+
+  // Fallback: cek Authorization header (Bearer token)
+  if (!token && req.headers.authorization?.startsWith("Bearer")) {
+    token = req.headers.authorization.split(" ")[1];
+  }
 
   if (token) {
     try {
@@ -23,10 +29,10 @@ export const protectedMiddleware = asyncHandler(async (req, res, next) => {
 });
 
 export const adminMiddleware = (req, res, next) => {
-  if (req.user && req.user.role === "admin") {
+  if (req.user) {
     next();
   } else {
     res.status(401);
-    throw new Error("Not Authorized as admin");
+    throw new Error("Not Authorized");
   }
 };
